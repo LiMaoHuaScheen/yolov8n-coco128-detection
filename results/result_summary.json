@@ -1,0 +1,56 @@
+{
+  "experiment": "YOLOv8n object detection on COCO128 split",
+  "date": "2026-11-22",
+  "hardware": "NVIDIA GeForce RTX 5060 Laptop GPU (8GB)",
+  "dataset": {
+    "name": "COCO128 (ultralytics official demo set)",
+    "split": {
+      "train": 80,
+      "val": 20,
+      "test": 28
+    },
+    "classes": 80,
+    "note": "Official coco128.yaml leaks train into val; a disjoint split was carved with seed 42."
+  },
+  "config": {
+    "imgsz": 640,
+    "batch": 8,
+    "epochs": 50,
+    "patience": 12
+  },
+  "arms": {
+    "zero_shot_pretrained": {
+      "precision": 0.7066,
+      "recall": 0.545,
+      "map50": 0.6365,
+      "map75": 0.4552,
+      "map50_95": 0.4552
+    },
+    "finetune_lr1e3": {
+      "precision": 0.7654,
+      "recall": 0.5151,
+      "map50": 0.6296,
+      "map50_95": 0.4554
+    },
+    "finetune_lr1e2_default": {
+      "precision": 0.7133,
+      "recall": 0.5483,
+      "map50": 0.6234,
+      "map50_95": 0.4512
+    },
+    "from_scratch": {
+      "precision": 0.0011,
+      "recall": 0.012,
+      "map50": 0.0006,
+      "map50_95": 0.0002
+    }
+  },
+  "conclusions": [
+    "Zero-shot pretrained YOLOv8n achieves mAP50 0.636 on the held-out 28-image test set without any COCO128 training.",
+    "Fine-tuning at lr=1e-3 gives mAP50 0.630 (mAP50-95 0.455), essentially unchanged from zero-shot.",
+    "Fine-tuning at default lr=1e-2 gives mAP50 0.623 (mAP50-95 0.451), also essentially unchanged.",
+    "Training from scratch on 80 images fails completely: mAP50 0.0006 — no meaningful learning at all.",
+    "Key insight: with only 80 training images across 80 COCO classes, the pretrained weights carry almost all the signal; additional fine-tuning on this tiny set neither helps nor hurts (within noise).",
+    "The 80-image dataset is far too small for any real domain adaptation; a larger dataset (e.g., full COCO or a domain-specific set) is needed for fine-tuning to show a positive delta."
+  ]
+}
